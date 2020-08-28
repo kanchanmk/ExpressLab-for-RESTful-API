@@ -69,9 +69,8 @@ routes.get("/cart-items", (req, res) => {
 	console.log(
 		"maxprice:" + maxprice + " prefix:" + prefix + " pageSize:" + pageSize
 	);
-	if (maxprice) {
-		// filterredArray = cart_items.filter((item) => item.price <= maxprice);
 
+	if (maxprice) {
 		if (prefix) {
 			filterredArray = cart_items.filter(
 				(item) => item.product.startsWith(prefix) && item.price <= maxprice
@@ -98,10 +97,10 @@ routes.get("/cart-items", (req, res) => {
 routes.get("/cart-items/:id", (req, res) => {
 	let id = parseInt(req.params.id);
 
-	let index = cart_items.findIndex((item) => item.id === id);
-	if (index != -1) {
+	let found = cart_items.find((item) => item.id === id);
+	if (found) {
 		res.status(200);
-		res.json(cart_items[index]);
+		res.json(found);
 	} else {
 		res.status(404);
 		res.send(`ID ${id} not found`);
@@ -114,19 +113,20 @@ routes.post("/cart-items", (req, res) => {
 	cart_items.push(item);
 
 	res.status(201);
-	res.json(cart_items);
+	res.json(item);
 });
 
 routes.put("/cart-items/:id", (req, res) => {
 	let id = parseInt(req.params.id);
 
-	let index = cart_items.findIndex((item) => {
-		return item.id === id;
-	});
+	let index = cart_items.findIndex((item) => item.id === id);
 
-	cart_items[index].product = req.body.product;
-	cart_items[index].price = Number(req.body.price);
-	cart_items[index].quantity = Number(req.body.quantity);
+	// cart_items[index].product = req.body.product;
+	// cart_items[index].price = Number(req.body.price);
+	// cart_items[index].quantity = Number(req.body.quantity);
+
+	cart_items[index] = req.body;
+	cart_items[index].id = id;
 	res.status(200);
 	res.json(cart_items);
 });
@@ -135,7 +135,7 @@ routes.delete("/cart-items/:id", (req, res) => {
 	let id = req.params.id;
 
 	let index = cart_items.findIndex((item) => {
-		return item.id === id;
+		return item.id === parseInt(id);
 	});
 
 	cart_items.splice(index, 1);
